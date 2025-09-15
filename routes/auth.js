@@ -1,3 +1,5 @@
+const blacklist = require("../blacklist");
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
@@ -17,6 +19,18 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ error: error.message});
     }
 });
+
+router.post("/logout", (req, res) => {
+    const token = req.header('Authorization');
+
+    if (!token) {
+        return res.status(400).json({ error: "Token expired"});
+    }
+
+    // Add token to blacklist
+    blacklist.add(token);
+    res.json({ message: "Logged out succesfully" });
+})
 
 // User login
 router.post('/login', async (req, res) => {
